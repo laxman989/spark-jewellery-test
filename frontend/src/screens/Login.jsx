@@ -31,7 +31,7 @@ const Login = () => {
             toast.error(error);
             dispatch(clearErrors());
         }
-        if(isAuthenticated) {
+        if(isAuthenticated === true) {
             navigate(redirect);
         }
     }, [dispatch, error, isAuthenticated, navigate, redirect]);
@@ -51,9 +51,9 @@ const Login = () => {
                 <div className="w-full my-2">
                     <Link to={"/password/forgot"} className="text-gray-600 font-medium text-sm text-right cursor-pointer">Forgot Password?</Link>
                 </div>
-                <div onClick={handleSubmit} className="w-full my-3">
-                    <button type="submit" className="w-full rounded-md text-sm py-2 font-semibold bg-red-700 text-white hover:bg-red-800 duration-150 ease-in-out">{
-                        loading ? <ImSpinner8 className="animate-spin mx-auto text-xl" /> : "Login"
+                <div className="w-full my-3">
+                    <button disabled={loading === true ? true : false} onClick={handleSubmit} type="submit" className="w-full rounded-md text-sm py-2 font-semibold bg-red-700 text-white hover:bg-red-800 duration-150 ease-in-out">{
+                        loading === true ? <ImSpinner8 className="animate-spin mx-auto text-xl" /> : "Login"
                     }</button>
                 </div>
             </form>

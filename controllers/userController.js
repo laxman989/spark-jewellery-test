@@ -4,14 +4,40 @@ const ErrorHandler = require("../utils/errorHandler");
 // const sendToken = require("../utils/jwtToken");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
+const jwt = require("jsonwebtoken");
+const { response } = require("express");
 
+// refresh
+exports.refresh = catchAsyncError(async (req, res, next) => {
+    const cookies = req.cookies;
+    if(!cookies?.jwt) return res.status(401).json({
+        message: "Unauthorized"
+    });
+
+    const refreshToken = cookies.jwt;
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET,  async (err, decoded) => {
+        if(err) return res.status(403).json({
+            message: "Forbidden"
+        })
+
+        const user = await User.findById(decoded._id);
+        if(!user) return res.status(401).json({
+            message: "Unauthorized"
+        })
+
+        const accessToken = jwt.sign({_id: user._id}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1d'});
+        res.status(200).json({
+            accessToken
+        })
+    })
+});
 
 // register user
 exports.registerUser = catchAsyncError(async (req, res, next) => {
     const { name, email, phoneNumber, password, confirmPassword } = req.body;
 
     if(!name || !email || !phoneNumber || !password || !confirmPassword) {
-        return next(new ErrorHandler("Please fill all the details", 400));
+        return next(new ErrorHandler("Please fill all the details.", 400));
     }
 
     if(password.length < 8) {
@@ -39,22 +65,21 @@ exports.registerUser = catchAsyncError(async (req, res, next) => {
         password,
     });
     
-    const token = user.getJwtToken();
+    // const token = user.getJwtToken();
 
     // options for cookie
-    const options = {
-        expires: new Date(
-            Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000
-        ),
-        maxAge: 360000,
-        httpOnly: true,
-    }
+    // const options = {
+    //     expires: new Date(
+    //         Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+    //     ),
+    //     maxAge: 360000,
+    //     httpOnly: true,
+    //     secure: true
+    // }
 
-    res.status(200).cookie("token", token, options).json({
+    res.status(200).json({
         success: true,
-        message: "User logged in successfully.",
-        token,
-        user
+        message: "User registered successfully.",
     })
 });
 
@@ -63,50 +88,82 @@ exports.loginUser = catchAsyncError(async (req, res, next) => {
     const { email, password } = req.body;
 
     if(!email || !password) {
-        return next(new ErrorHandler("Please fill all the details", 400));
+        return next(new ErrorHandler("Please fill all the details.", 400));
     }
 
     const user = await User.findOne({ email }).select("+password");
 
     if(!user) {
-        return next(new ErrorHandler("Invalid email or password", 401));
+        return next(new ErrorHandler("Invalid email or password.", 401));
     }
 
     const isPasswordMatch = await user.comparePassword(password);
 
     if(!isPasswordMatch) {
-        return next(new ErrorHandler("Invalid email or password", 401));
+        return next(new ErrorHandler("Invalid email or password.", 401));
     }
 
-    const token = user.getJwtToken();
+    // const token = user.getJwtToken();
 
     // options for cookie
-    const options = {
-        expires: new Date(
-            Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000
-        ),
-        maxAge: 360000,
-        httpOnly: true,
-    }
+    // const options = {
+    //     expires: new Date(
+    //         Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+    //     ),
+    //     maxAge: 360000,
+    //     httpOnly: true,
+    //     secure: true
+    // }
 
-    res.status(200).cookie("token", token, options).json({
+    // res.status(200).cookie("token", token, options).json({
+    //     success: true,
+    //     message: "User logged in successfully.",
+    //     token,
+    //     user
+    // })
+
+    const accessToken = jwt.sign({_id: user._id}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1d'});
+    // const refreshToken = jwt.sign({_id: user._id}, process.env.REFRESH_TOKEN_SECRET, {expiresIn: '1d'});
+
+    // create secure cookie with access token
+    const options = {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None",
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+    };
+    res.cookie('jwt', accessToken, options);
+    res.status(200).json({
         success: true,
         message: "User logged in successfully.",
-        token,
+        accessToken,
         user
     })
 });
 
 // logout user
 exports.logoutUser = catchAsyncError(async (req, res, next) => {
-    res.cookie("token", null, {
-        expires: new Date(Date.now()),
-        httpOnly: true
-    });
+    // res.cookie("token", null, {
+    //     expires: new Date(Date.now()),
+    //     httpOnly: true,
+    //     secure: true
+    // });
+    const cookies = req.cookies;
+    if(!cookies?.jwt) return res.status(204).json({
+        success: true,
+        message: "No content."
+    })
+
+    const options = {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None",
+    };
+    res.clearCookie('jwt', options);
 
     res.status(200).json({
         success: true,
-        message: "User logged out successfully."
+        message: "User logged out."
     })
 });
 
@@ -115,7 +172,7 @@ exports.forgotPassword = catchAsyncError(async (req, res, next) => {
     const user = await User.findOne({email: req.body.email});
 
     if(!user) {
-        return next(new ErrorHandler(`User not found with email ${req.body.email}`, 404));
+        return next(new ErrorHandler(`No account linked with email ${req.body.email}`, 404));
     }
 
     // get reset password token
@@ -123,10 +180,9 @@ exports.forgotPassword = catchAsyncError(async (req, res, next) => {
 
     await user.save({validateBeforeSave: false});
 
-    // const resetPasswordUrl = `${req.protocol}://${req.get("host")}/password/reset/${resetToken}`;
-    const resetPasswordUrl = `http://localhost:3000/password/reset/${resetToken}`;
+    const resetPasswordUrl = `${req.protocol}://${req.get("host")}/password/reset/${resetToken}`;
 
-    const message = `Hi ${req.name},\n\nForgot your password?\nWe have received a request to reset the password for your account.\nTo reset your password, click on the link below:\n${resetPasswordUrl}\n\nKindly ignore, if you have not requested this email.\n\n\n<p style={"font-weight: bold"}>SPARK Jewellery Private Limited.</p>`;
+    const message = `Hi ${user.name},\n\nForgot your password?\n\nWe have received a request to reset the password for your account.\n\nTo reset your password, click on the link below:\n${resetPasswordUrl}\n\nKindly ignore, if you have not requested this email.\n\n\nSPARK Jewellery Private Limited.`;
 
     try {
         await sendEmail({
@@ -152,7 +208,7 @@ exports.forgotPassword = catchAsyncError(async (req, res, next) => {
 
 // reset password
 exports.resetPassword = catchAsyncError(async (req, res, next) => {
-    const resetPasswordToken = crypto.createHash("sha256").update(req.params.resetToken).digest("hex");
+    const resetPasswordToken = crypto.createHash("sha256").update(req.params.token).digest("hex");
 
     const user = await User.findOne({
         resetPasswordToken,
@@ -160,11 +216,15 @@ exports.resetPassword = catchAsyncError(async (req, res, next) => {
     })
 
     if(!user) {
-        return next(new ErrorHandler("Reset password token is invalid or has been expired.", 400));
+        return next(new ErrorHandler("Reset Password link is invalid or has been expired.", 400));
     }
 
     if(req.body.password !== req.body.confirmPassword) {
         return next(new ErrorHandler("Password and Confirm Password must be same.", 400));
+    }
+
+    if(req.body.password.length < 8) {
+        return next(new ErrorHandler("Password must have at least 8 characters.", 400));
     }
 
     user.password = req.body.password;
@@ -173,30 +233,15 @@ exports.resetPassword = catchAsyncError(async (req, res, next) => {
 
     await user.save();
 
-    const token = user.getJwtToken();
-
-    // options for cookie
-    const options = {
-        expires: new Date(
-            Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000
-        ),
-        httpOnly: true,
-        // secure: true,
-    }
-
-    await user.select("-password");
-
-    res.status(200).cookie("token", token, options).json({
+    res.status(200).json({
         success: true,
-        message: "Password reset successfully.",
-        token,
-        user
+        message: "Password has been updated. Login to continue",
     })
 });
 
 // get user details --logged in
 exports.getUserDetails = catchAsyncError(async (req, res, next) => {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user._id);
 
     res.status(200).json({
         success: true,
@@ -206,44 +251,43 @@ exports.getUserDetails = catchAsyncError(async (req, res, next) => {
 
 // update user password --logged in
 exports.updatePassword = catchAsyncError(async (req, res, next) => {
-    const user = await User.findById(req.user.id).select("+password");
+    if(!req.body.oldPassword || !req.body.password || !req.body.confirmPassword) {
+        return next(new ErrorHandler("Please fill all the details.", 400));
+    }
+    const user = await User.findById(req.user._id).select("+password");
 
-    const isPasswordMatched = user.comparePassword(req.body.oldPassword);
+    const isPasswordMatched = await user.comparePassword(req.body.oldPassword);
 
-    if(!isPasswordMatched) {
+    if(isPasswordMatched === false) {
         return next(new ErrorHandler("Old Password is incorrect.", 400));
     }
     
-    if(req.body.newPassword === req.body.oldPassword) {
-        return next(new ErrorHandler("Old Password and New Password cannot be same", 400));
+    if(req.body.password === req.body.oldPassword) {
+        return next(new ErrorHandler("Old Password and New Password cannot be same.", 400));
     }
     
-    if(req.body.newPassword !== req.body.confirmNewPassword) {
+    if(req.body.password !== req.body.confirmPassword) {
         return next(new ErrorHandler("New Password and Confirm New Password must be same.", 400));
     }
 
-    user.password = req.body.newPassword;
+    user.password = req.body.password;
 
     await user.save();
 
-    const token = user.getJwtToken();
+    const accessToken = jwt.sign({_id: user._id}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1d'});
 
-    // options for cookie
     const options = {
-        expires: new Date(
-            Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000
-        ),
         httpOnly: true,
-        // secure: true,
-    }
+        secure: true,
+        sameSite: "None",
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+    };
+    res.cookie('jwt', accessToken, options);
 
-    await user.select("-password");
-
-    res.status(200).cookie("token", token, options).json({
+    res.status(200).json({
         success: true,
-        message: "Password updated successfully.",
-        token,
-        user
+        message: "Password has been updated.",
+        accessToken,
     })
 });
 
@@ -255,6 +299,14 @@ exports.updateProfile = catchAsyncError(async (req, res, next) => {
         phoneNumber: req.body.phoneNumber,
     }
 
+    if(!newData.name || !newData.email || !newData.phoneNumber) {
+        return next(new ErrorHandler("Please fill all the details.", 400));
+    }
+
+    if(newData.phoneNumber.length !== 10) {
+        return next(new ErrorHandler("Phone Number must be 10 digits.", 400));
+    }
+
     const user = await User.findByIdAndUpdate(req.user.id, newData, {
         new: true,
         runValidators: true,
@@ -263,7 +315,7 @@ exports.updateProfile = catchAsyncError(async (req, res, next) => {
 
     res.status(200).json({
         success: true,
-        message: "User profile updated successfully.",
+        message: "Profile has been updated.",
         user
     })
 });

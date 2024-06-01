@@ -32,7 +32,7 @@ const ProductImagesCarousel = ({ data }) => {
                 {
                     data?.map((image, index) => {
                         return(
-                            <img key={index} className={index === current ? "select-none pb-4 w-full h-[450px] object-contain" : "hidden"} src={image.image} alt="img" />
+                            <img key={index} className={index === current ? "select-none pb-4 w-full h-[450px] object-contain" : "hidden"} src={image.imageUrl} alt="img" />
                             )
                         })
                     }
@@ -43,7 +43,7 @@ const ProductImagesCarousel = ({ data }) => {
                 {
                     data?.map((image, index) => {
                         return(
-                            <img key={index} onClick={() => setCurrent(index)} className={index === current ? "w-[70px] aspect-square object-contain border-[1px] border-gray-900 cursor-pointer" : "w-[70px] aspect-square object-contain border-[1px] cursor-pointer opacity-90"} src={image.image} alt="img" />
+                            <img key={index} onClick={() => setCurrent(index)} className={index === current ? "w-[70px] aspect-square object-contain border-[1px] border-gray-900 cursor-pointer" : "w-[70px] aspect-square object-contain border-[1px] cursor-pointer opacity-90"} src={image.imageUrl} alt="img" />
                         )
                     })
                 }

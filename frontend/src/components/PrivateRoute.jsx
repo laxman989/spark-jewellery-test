@@ -1,14 +1,26 @@
-import React from "react";
-import { useSelector } from "react-redux";
-import { useState, useEffect } from "react";
-import { Outlet, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { loadUser } from "../actions/UserAction";
 
-const PrivateRoute = ({ isAdmin = false }) => {
+const PrivateRoute = ({isAdmin=false, Component }) => {
+    // const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { user, isAuthenticated } = useSelector(state => state.userReducer);
 
-    if (isAuthenticated === false) return <Navigate to="/login" replace />
-    if (isAdmin === true && user.role !== "admin") return <Navigate to="/login" replace />
-    return <Outlet />
+    useEffect(() => {
+        if (!user || isAuthenticated === false) {
+            navigate('/login');
+            return
+        }
+        if (isAdmin === true && user?.role !== "Admin") {
+            navigate('/login');
+            return
+        }
+    }, [navigate, isAdmin, isAuthenticated, user]);
+
+
+    return <Component />
 }
 
 export default PrivateRoute;

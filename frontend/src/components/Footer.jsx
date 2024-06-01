@@ -6,7 +6,7 @@ const Footer = () => {
     const [keyword, setKeyword] = useState("");
 
     return(
-        <div className="z-20 w-full bg-gradient-to-r from-gray-200 to-gray-100 text-gray-900">
+        <div className="z-20 w-full bg-gradient-to-r from-red-300 to-red-100 text-gray-900">
             <div className="max-w-[1200px] sm:mx-auto py-8 px-2">
                 <div className="grid md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-4">
                     <div className="col-span-1">
@@ -50,7 +50,7 @@ const Footer = () => {
                     </div>
                 </div>
                 <div>
-                    <p className="text-sm text-gray-400 mt-4">Copyright &copy; 2021 SPARK Jewellery Private Ltd.</p>
+                    <p className="text-sm text-gray-50 mt-4">Copyright &copy; 2021 SPARK Jewellery Private Ltd.</p>
                 </div>
             </div>
         </div>

@@ -12,7 +12,7 @@ const Register = () => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
 
-    const { loading, isAuthenticated, error } = useSelector(state => state.userReducer);
+    const { loading, error, success } = useSelector(state => state.userReducer);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -27,7 +27,6 @@ const Register = () => {
         formData.set("confirmPassword", confirmPassword);
 
         dispatch(register(formData));
-        toast.success("User registered successfully.");
     }
 
     useEffect(() => {
@@ -35,10 +34,11 @@ const Register = () => {
             toast.error(error);
             dispatch(clearErrors());
         }
-        if(isAuthenticated) {
-            navigate("/account/profile");
+        if(success) {
+            toast.success("User registered successfully.");
+            navigate("/login");
         }
-    }, [error, isAuthenticated, dispatch, navigate]);
+    }, [error, dispatch, navigate, success]);
 
     return (
         <div className="w-full py-8 flex flex-col items-center justify-center">
@@ -66,7 +66,7 @@ const Register = () => {
                 </div>
 
                 <div className="w-full my-3">
-                    <button onClick={handleSubmit} type="submit" className="w-full rounded-md text-sm py-2 font-semibold bg-red-700 text-white hover:bg-red-800 duration-150 ease-in-out">{
+                    <button disabled={loading ? true : false} onClick={handleSubmit} type="submit" className="w-full rounded-md text-sm py-2 font-semibold bg-red-700 text-white hover:bg-red-800 duration-150 ease-in-out">{
                         loading ? <ImSpinner8 className="animate-spin mx-auto text-xl" /> : "Register"
                     }</button>
                 </div>

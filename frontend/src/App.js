@@ -24,10 +24,13 @@ import { loadUser } from './actions/UserAction';
 // import Loader from './components/Loader';
 import store from './store';
 import Products from './screens/Products';
+import OrderSuccess from './screens/OrderSuccess';
+import OrderFail from './screens/OrderFail';
 
 const App = () => {
     useEffect(() => {
-        store.dispatch(loadUser());
+        const token = localStorage.getItem('token') ? JSON.parse(localStorage.getItem('token')) : '';
+        store.dispatch(loadUser(token));
     }, [])
 
     return(
@@ -36,6 +39,7 @@ const App = () => {
             <Routes>
                 <Route exact path='/' element={<Home />} />
                 <Route exact path='/products' element={<Products />} />
+                <Route exact path='/products/:search' element={<Products />} />
                 <Route exact path='/product/:productId' element={<ProductDetails />} />
 
                 <Route exact path='/login' element={<Login />} />
@@ -43,24 +47,24 @@ const App = () => {
                 <Route exact path='/password/forgot' element={<ForgotPassword />} />
                 <Route exact path='/password/reset/:token' element={<ResetPassword />} />
 
-                <Route path='/account/*' element={<PrivateRoute />} >
-                    <Route exact path='updateProfile' element={<UpdateProfile />} />
-                    <Route exact path='updatePassword' element={<UpdatePassword />} />
-                    <Route exact path='profile' element={<Account />} />
-                    <Route exact path='orders' element={<Orders />} />
-                    <Route exact path='order/:orderId' element={<OrderDetails />} />
-                </Route>
+                <Route exact path='/account/orders' element={<PrivateRoute Component={Orders} />} />
+                <Route exact path='/account/profile' element={<PrivateRoute Component={Account} />} />
+                <Route exact path='/account/order/:orderId' element={<PrivateRoute Component={OrderDetails} />} />
+
+                <Route exact path='/account/password/update' element={<PrivateRoute Component={UpdatePassword}/>} />
+                <Route exact path='/account/profile/update' element={<PrivateRoute Component={UpdateProfile} />} />
 
                 <Route exact path='/cart' element={<Cart />} />
                 <Route exact path='/shipping' element={<Shipping />} />
                 <Route exact path='/order/confirm' element={<ConfirmOrder />} />
 
                 <Route exact path='/*' element={<PageNotFound />} />
-                {/* <Route exact path='/loader' element={<Loader />} /> */}
-                <Route exact path='/product/:productId' element={<ProductDetails />} />
-                <Route exact path='/product/:productId/review' element={<CreateReview />} />
+                <Route exact path='/product/:productId/review/write' element={<CreateReview />} />
 
-                <Route exact path='/account/admin/*' element={<DashboardRoute />} />
+                <Route exact path='/account/admin/*' element={<PrivateRoute Component={DashboardRoute} />} />
+
+                <Route exact path='/order/success' element={<OrderSuccess />} />
+                <Route exact path='/order/fail' element={<OrderFail />} />
             </Routes>
             <Footer/>
         </div>

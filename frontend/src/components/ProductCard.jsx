@@ -1,17 +1,18 @@
 import React from "react";
 import { FaStar } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import dummyImage from "../assets/dummyImage.jfif";
 
 const ProductCard = ({ product }) => {
     return(
-        <div key={product.id} className="rounded-lg shadow-md overflow-hidden bg-white w-1/4">
+        <div key={product.id} className="rounded-lg shadow-md overflow-hidden bg-white">
             <div className="relative">
-                <img className="w-full h-48 object-cover" src={product.images[0].image} alt={product.images[0].image} />
-                <div className="shadow flex products-center justify-center bg-gray-100 text-sm rounded-full absolute bottom-0 left-0 m-4 px-2">
-                    <span>{product.ratingCount}</span>
+                <img className="w-full h-48 object-cover" src={product.images[0].imageUrl} alt={dummyImage} />
+                <div className="shadow flex items-center justify-center bg-gray-100 text-sm rounded-full absolute bottom-0 left-0 m-4 px-2">
+                    <span>{product.ratingsCount}</span>
                     <FaStar className="text-yellow-500" />
                     <span className="px-1">|</span>
-                    <span>{product.reviews.length}</span>
+                    <span>{product.reviewsCount}</span>
                 </div>
             </div>
             <div className="p-4">
@@ -22,8 +23,8 @@ const ProductCard = ({ product }) => {
             </div>
             <div className="flex products-center justify-between px-4 pb-2">
                 <Link
-                to={`/product/${product.id}`}
-                className="inline-flex products-center px-3 py-2 text-sm font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800"
+                to={`/product/${product._id}`}
+                className="inline-flex products-center px-3 py-2 text-[12px] font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800"
                 >
                 View Details
                 </Link>

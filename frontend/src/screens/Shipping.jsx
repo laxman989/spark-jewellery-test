@@ -1,33 +1,194 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ImSpinner8 } from "react-icons/im";
-const states = ["Maharashtra", "Rajasthan", "Gujarat", "Punjab", "Haryana", "Uttar Pradesh", "Bihar", "Tamil Nadu"];
+import { useDispatch } from "react-redux";
+import { saveShippingInfo } from "../actions/CartAction";
+import toast from "react-hot-toast";
+import MetaData from "../components/MetaData.js";
+
+const states = [
+    {
+    "key": "AN",
+    "name": "Andaman and Nicobar Islands"
+    },
+    {
+    "key": "AP",
+    "name": "Andhra Pradesh"
+    },
+    {
+    "key": "AR",
+    "name": "Arunachal Pradesh"
+    },
+    {
+    "key": "AS",
+    "name": "Assam"
+    },
+    {
+    "key": "BR",
+    "name": "Bihar"
+    },
+    {
+    "key": "CG",
+    "name": "Chandigarh"
+    },
+    {
+    "key": "CH",
+    "name": "Chhattisgarh"
+    },
+    {
+    "key": "DH",
+    "name": "Dadra and Nagar Haveli"
+    },
+    {
+    "key": "DD",
+    "name": "Daman and Diu"
+    },
+    {
+    "key": "DL",
+    "name": "Delhi"
+    },
+    {
+    "key": "GA",
+    "name": "Goa"
+    },
+    {
+    "key": "GJ",
+    "name": "Gujarat"
+    },
+    {
+    "key": "HR",
+    "name": "Haryana"
+    },
+    {
+    "key": "HP",
+    "name": "Himachal Pradesh"
+    },
+    {
+    "key": "JK",
+    "name": "Jammu and Kashmir"
+    },
+    {
+    "key": "JH",
+    "name": "Jharkhand"
+    },
+    {
+    "key": "KA",
+    "name": "Karnataka"
+    },
+    {
+    "key": "KL",
+    "name": "Kerala"
+    },
+    {
+    "key": "LD",
+    "name": "Lakshadweep"
+    },
+    {
+    "key": "MP",
+    "name": "Madhya Pradesh"
+    },
+    {
+    "key": "MH",
+    "name": "Maharashtra"
+    },
+    {
+    "key": "MN",
+    "name": "Manipur"
+    },
+    {
+    "key": "ML",
+    "name": "Meghalaya"
+    },
+    {
+    "key": "MZ",
+    "name": "Mizoram"
+    },
+    {
+    "key": "NL",
+    "name": "Nagaland"
+    },
+    {
+    "key": "OR",
+    "name": "Odisha"
+    },
+    {
+    "key": "PY",
+    "name": "Puducherry"
+    },
+    {
+    "key": "PB",
+    "name": "Punjab"
+    },
+    {
+    "key": "RJ",
+    "name": "Rajasthan"
+    },
+    {
+    "key": "SK",
+    "name": "Sikkim"
+    },
+    {
+    "key": "TN",
+    "name": "Tamil Nadu"
+    },
+    {
+    "key": "TS",
+    "name": "Telangana"
+    },
+    {
+    "key": "TR",
+    "name": "Tripura"
+    },
+    {
+    "key": "UK",
+    "name": "Uttar Pradesh"
+    },
+    {
+    "key": "UP",
+    "name": "Uttarakhand"
+    },
+    {
+    "key": "WB",
+    "name": "West Bengal"
+    }
+];
 
 const Shipping = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const [loading, setLoading] = useState(false);
-    const [country, setCountry] = useState("India");
-    const [state, setState] = useState("");
-    const [city, setCity] = useState("");
     const [address, setAddress] = useState("");
+    const [city, setCity] = useState("");
     const [pincode, setPincode] = useState("");
+    const [state, setState] = useState("");
+    const [country, setCountry] = useState("India");
+    const [landmark, setLandmark] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        if(phoneNumber.length !== 10) {
-            alert("Phone number must be 10 characters");
+        if(!address || !city || !state || !pincode || !country || !landmark || !phoneNumber) {
+            toast.error("Please fill all the details.");
             return;
         }
-        // dispatch(saveShippingInfo({
-        //     address, city, state, country, pincode, phoneNumber
-        // }));
+        if(pincode.length !== 6) {
+            toast.error("Please enter valid 6 digits Pincode.");
+            return;
+        }
+        if(phoneNumber.length !== 10) {
+            toast.error("Please enter valid 10 digits Phone Number.");
+            return;
+        }
+        dispatch(saveShippingInfo({
+            address, city, state, country, pincode, landmark, phoneNumber
+        }));
         navigate("/order/confirm");
     }
 
     return(
+        <>
+        <MetaData title="Shipping Details" />
         <div className="w-full py-8 flex flex-col items-center justify-center">
             <form onSubmit={handleSubmit} className="md:w-1/4 sm:w-1/2 w-full md:px-0 px-8 flex flex-col items-center justify-center">
             <h1 className="text-4xl font-bold mb-4">Shipping Details</h1>
@@ -54,8 +215,8 @@ const Shipping = () => {
                         <select required value={state} onChange={(e) => setState(e.target.value)} className="mt-2 bg-gray-50 w-full text-sm px-2 py-2 outline outline-1 outline-gray-300 focus:bg-white focus:outline-2 focus:outline-gray-900 rounded block" id="state">
                             <option value="">Select state</option>
                             {
-                                states.map((item, index) => (
-                                    <option key={index}>{item}</option>
+                                states.map((item) => (
+                                    <option key={item.key}>{item.name}</option>
                                 ))
                             }  
                         </select>
@@ -68,7 +229,7 @@ const Shipping = () => {
 
                 <div className="w-full my-3">
                     <label className="text-sm font-semibold" htmlFor="landmark">Landmark</label>
-                    <input value={address} onChange={(e) => setAddress(e.target.value)} className="mt-2 bg-gray-50 w-full text-sm px-2 py-2 outline outline-1 outline-gray-300 focus:bg-white focus:outline-2 focus:outline-gray-900 rounded block" id="landmark" type="text" placeholder="Enter landmark" />
+                    <input value={landmark} onChange={(e) => setLandmark(e.target.value)} className="mt-2 bg-gray-50 w-full text-sm px-2 py-2 outline outline-1 outline-gray-300 focus:bg-white focus:outline-2 focus:outline-gray-900 rounded block" id="landmark" type="text" placeholder="Enter landmark" />
                 </div>
 
                 <div className="w-full my-3">
@@ -77,12 +238,13 @@ const Shipping = () => {
                 </div>
 
                 <div onClick={handleSubmit} className="w-full my-3">
-                    <button type="submit" className="w-full rounded text-sm py-2 font-semibold bg-red-700 text-white hover:bg-red-800 duration-150 ease-in-out">{
+                    <button type="submit" className="active:bg-red-900 active:scale-95 w-full rounded text-sm py-2 font-semibold bg-red-700 text-white hover:bg-red-800 duration-150 ease-in-out">{
                         loading ? <ImSpinner8 className="animate-spin mx-auto text-xl" /> : "Proceed"
                     }</button>
                 </div>
             </form>
         </div>
+    </>
     )
 
 }
