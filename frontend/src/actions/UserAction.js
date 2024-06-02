@@ -1,5 +1,6 @@
 import axios from "axios";
 import { ADMIN_USERS_FAIL, ADMIN_USERS_REQUEST, ADMIN_USERS_SUCCESS, CLEAR_ERRORS, FORGOT_PASSWORD_FAIL, FORGOT_PASSWORD_REQUEST, FORGOT_PASSWORD_SUCCESS, LOAD_USER_FAIL, LOAD_USER_REQUEST, LOAD_USER_SUCCESS, LOGIN_FAIL, LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT_FAIL, LOGOUT_SUCCESS, REGISTER_FAIL, REGISTER_REQUEST, REGISTER_SUCCESS, RESET_PASSWORD_FAIL, RESET_PASSWORD_REQUEST, RESET_PASSWORD_SUCCESS, UPDATE_PASSWORD_FAIL, UPDATE_PASSWORD_REQUEST, UPDATE_PASSWORD_SUCCESS, UPDATE_PROFILE_FAIL, UPDATE_PROFILE_REQUEST, UPDATE_PROFILE_SUCCESS } from "../constants/UserConstant";
+const baseUrl = "https://sparkjewellery.onrender.com";
 
 const token = localStorage.getItem("token") ? localStorage.getItem("token") : "";
 
@@ -13,13 +14,13 @@ export const login = (email, password) => async (dispatch) => {
 
         headers.append('Content-Type', 'application/json');
         headers.append('Accept', 'application/json');
-        headers.append('Origin','http://localhost:3000');
+        headers.append('Origin', baseUrl);
         const config = {
             mode: 'cors',
             credentials: 'include',
             headers: headers,
         }
-        const { data } = await axios.post(`http://localhost:8080/api/v1/user/login`, {email, password}, config);
+        const { data } = await axios.post(`${baseUrl}/api/v1/user/login`, {email, password}, config);
 
         dispatch({ type: LOGIN_SUCCESS, payload: data });
         localStorage.setItem("token", JSON.stringify(data.accessToken));
@@ -38,13 +39,13 @@ export const register = (userData) => async (dispatch) => {
 
         headers.append('Content-Type', 'application/json');
         headers.append('Accept', 'application/json');
-        headers.append('Origin','http://localhost:3000');
+        headers.append('Origin', baseUrl);
         const config = {
             mode: 'cors',
             credentials: 'include',
             headers: headers,
         }
-        const { data } = await axios.post(`http://localhost:8080/api/v1/user/register`, userData, config);
+        const { data } = await axios.post(`${baseUrl}/api/v1/user/register`, userData, config);
 
         dispatch({ type: REGISTER_SUCCESS, payload: data.user });
     } 
@@ -64,7 +65,7 @@ export const loadUser = (token) => async (dispatch) => {
             credentials: 'include',
             headers: headers,
         };
-        const { data } = await axios.get(`http://localhost:8080/api/v1/user/me`, config);
+        const { data } = await axios.get(`${baseUrl}/api/v1/user/me`, config);
         console.log(data.user);
         dispatch({ type: LOAD_USER_SUCCESS, payload: data.user });
     } 
@@ -75,7 +76,7 @@ export const loadUser = (token) => async (dispatch) => {
 
 export const logout = () => async (dispatch) => {
     try {
-        await axios.get(`http://localhost:8080/api/v1/user/logout`);
+        await axios.get(`${baseUrl}/api/v1/user/logout`);
 
         dispatch({ type: LOGOUT_SUCCESS });
     } 
@@ -93,13 +94,13 @@ export const updateProfile = (userData) => async (dispatch) => {
 
         headers.append('Content-Type', 'application/json');
         headers.append('Accept', 'application/json');
-        headers.append('Origin','http://localhost:3000');
+        headers.append('Origin', baseUrl);
         const config = {
             mode: 'cors',
             credentials: 'include',
             headers: headers,
         }
-        const { data } = await axios.put(`http://localhost:8080/api/v1/user/profile/update`, userData, config);
+        const { data } = await axios.put(`${baseUrl}/api/v1/user/profile/update`, userData, config);
 
         dispatch({ type: UPDATE_PROFILE_SUCCESS, payload: data });
     } 
@@ -117,13 +118,13 @@ export const updatePassword = (passwords) => async (dispatch) => {
 
         headers.append('Content-Type', 'application/json');
         headers.append('Accept', 'application/json');
-        headers.append('Origin','http://localhost:3000');
+        headers.append('Origin', baseUrl);
         const config = {
             mode: 'cors',
             credentials: 'include',
             headers: headers,
         }
-        const { data } = await axios.put(`http://localhost:8080/api/v1/user/password/update`, passwords, config);
+        const { data } = await axios.put(`${baseUrl}/api/v1/user/password/update`, passwords, config);
 
         dispatch({ type: UPDATE_PASSWORD_SUCCESS, payload: data });
     } 
@@ -140,13 +141,13 @@ export const forgotPassword = (email) => async (dispatch) => {
 
         headers.append('Content-Type', 'application/json');
         headers.append('Accept', 'application/json');
-        headers.append('Origin','http://localhost:3000');
+        headers.append('Origin', baseUrl);
         const config = {
             mode: 'cors',
             credentials: 'include',
             headers: headers,
         }
-        const { data } = await axios.post(`http://localhost:8080/api/v1/password/forgot`, {email}, config);
+        const { data } = await axios.post(`${baseUrl}/api/v1/password/forgot`, {email}, config);
 
         dispatch({ type: FORGOT_PASSWORD_SUCCESS, payload: data.message });
     } 
@@ -163,13 +164,13 @@ export const resetPassword = (token, passwords) => async (dispatch) => {
 
         headers.append('Content-Type', 'application/json');
         headers.append('Accept', 'application/json');
-        headers.append('Origin','http://localhost:3000');
+        headers.append('Origin', baseUrl);
         const config = {
             mode: 'cors',
             credentials: 'include',
             headers: headers,
         }
-        const { data } = await axios.put(`http://localhost:8080/api/v1/password/reset/${token}`, passwords, config);
+        const { data } = await axios.put(`${baseUrl}/api/v1/password/reset/${token}`, passwords, config);
 
         dispatch({ type: RESET_PASSWORD_SUCCESS, payload: data });
     } 
@@ -183,7 +184,7 @@ export const getUsersAdmin = () => async (dispatch) => {
     try {
         dispatch({ type: ADMIN_USERS_REQUEST });
         axios.defaults.withCredentials = true;
-        const { data } = await axios.get(`http://localhost:8080/api/v1/admin/users`);
+        const { data } = await axios.get(`${baseUrl}/api/v1/admin/users`);
 
         dispatch({ type: ADMIN_USERS_SUCCESS, payload: data });
     } 

@@ -1,8 +1,9 @@
 import { ADD_TO_CART, REMOVE_FROM_CART, SAVE_SHIPPING_INFO } from "../constants/CartConstant";
 import axios from "axios";
+const baseUrl = "https://sparkjewellery.onrender.com";
 
 export const addToCart = (productId, quantity) => async (dispatch, getState) => {
-    const { data } = await axios.get(`http://localhost:8080/api/v1/product/${productId}`);
+    const { data } = await axios.get(`${baseUrl}/api/v1/product/${productId}`);
 
     dispatch({ type: ADD_TO_CART, payload: {
         product: data.product._id,
