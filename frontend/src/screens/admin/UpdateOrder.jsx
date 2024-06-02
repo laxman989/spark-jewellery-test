@@ -114,7 +114,7 @@ const UpdateOrder = () => {
                             order.orderItems && order.orderItems.map((order) => (
                                 <div key={order._id} className="rounded border flex items-start justify-between p-2 gap-4">
                                     <img className="sm:w-24 sm:h-24 w-20 h-20 object-contain rounded" src={order.image} alt="productImage" />
-                                    <div className="grid grid-cols-4">
+                                    <div className="flex-1 grid grid-cols-4">
                                         <div className="col-span-2 pt-2">
                                             <p className="">{order.name}</p>
                                         </div>
