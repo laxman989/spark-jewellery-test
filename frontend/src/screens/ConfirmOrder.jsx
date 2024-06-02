@@ -21,16 +21,17 @@ const ConfirmOrder = () => {
     const landmark = shippingInfo.landmark;
     const [paymentMethod, setPaymentMethod] = useState("Card");
     const [loading, setLoading] = useState(false);
+    const baseUrl = "https://sparkjewellery.onrender.com";
 
     const handleSubmit = async () => {
 
-        const { data:{keyId} } = await axios.get("http://localhost:8080/api/v1/payment/key");
+        const { data:{keyId} } = await axios.get(`${baseUrl}/api/v1/payment/key`);
 
         let headers = new Headers();
         
         headers.append('Content-Type', 'application/json');
         headers.append('Accept', 'application/json');
-        headers.append('Origin','http://localhost:3000');
+        headers.append('Origin', baseUrl);
         const config = {
             mode: 'cors',
             credentials: 'include',
@@ -39,7 +40,7 @@ const ConfirmOrder = () => {
         
         try {
             const amount = shippingPrice + cartItems.reduce((acc, item) => acc + (item.quantity * item.discountPrice), 0)
-            const { data:{order} } = await axios.post("http://localhost:8080/api/v1/payment/process", {amount}, config);
+            const { data:{order} } = await axios.post(`${baseUrl}/api/v1/payment/process`, {amount}, config);
             console.log(order);
             const options = {
                 key: keyId, 
@@ -60,20 +61,20 @@ const ConfirmOrder = () => {
 
                     headers.append('Content-Type', 'application/json');
                     headers.append('Accept', 'application/json');
-                    headers.append('Origin','http://localhost:3000');
+                    headers.append('Origin', baseUrl);
                     const config = {
                         mode: 'cors',
                         credentials: 'include',
                         headers: headers,
                     }
     
-                    const paymentResponse = await axios.post("http://localhost:8080/api/v1/payment/verify", data, config);
+                    const paymentResponse = await axios.post(`${baseUrl}/api/v1/payment/verify`, data, config);
                     if(paymentResponse.data?.success === true) {
                         let headers = new Headers();
 
                         headers.append('Content-Type', 'application/json');
                         headers.append('Accept', 'application/json');
-                        headers.append('Origin','http://localhost:3000');
+                        headers.append('Origin', baseUrl);
                         const config = {
                             mode: 'cors',
                             credentials: 'include',
@@ -94,7 +95,7 @@ const ConfirmOrder = () => {
                         }
                         
                         setLoading(true);
-                        const orderResponse = await axios.post("http://localhost:8080/api/v1/order/new", orderData, config);
+                        const orderResponse = await axios.post(`${baseUrl}/api/v1/order/new`, orderData, config);
                         setTimeout(() => {
                             setLoading(false);
                         }, 2000)
