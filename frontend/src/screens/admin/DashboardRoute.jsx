@@ -16,7 +16,7 @@ const DashboardRoute = () => {
 );
   const location = useLocation();
   return (
-    <div className="w-full grid grid-cols-12 h-[90vh]">
+    <div className="w-full sm:grid sm:grid-cols-12 flex flex-col h-[90vh]">
         {/* side bar */}
         <div className="sm:col-span-2 bg-gray-50 text-gray-900 shadow px-4">
             <NavLink to={"/account/admin/dashboard"} className={`block text-base rounded my-1 p-4 hover:bg-gray-200 ${location.pathname === '/account/admin/dashboard' ? 'bg-gray-200' : ''}`}>Dashboard</NavLink>
