@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react"; 
 import Carousel from "../components/Carousel";
 import { Link } from "react-router-dom";
-import { FaStar } from "react-icons/fa";
-import { getProducts } from "../actions/ProductAction";
-import { useDispatch, useSelector } from "react-redux";
-import toast from "react-hot-toast";
 import Loader from "../components/Loader";
+import banner1 from "../assets/banner1.webp";
+import b1 from "../assets/b1.webp";
+import b2 from "../assets/b2.webp";
+import b3 from "../assets/b3.webp";
+import b4 from "../assets/b4.webp";
 
-const images = ["https://www.giva.co/cdn/shop/files/Hero_web_Bestsellers-min.jpg?v=1714041427&width=3000", "https://www.giva.co/cdn/shop/files/Hero_web_Gold_Jewellery_2_-min.jpg?v=1714163504&width=3000" ];
+const images = [ b1, b2, b3, b4 ];
 
 const specialBanners = [
     {
