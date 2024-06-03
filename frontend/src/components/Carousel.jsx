@@ -46,7 +46,7 @@ const Carousel = ({ items }) => {
                     </div>
                 ))}
             </div>
-            <button onClick={handlePrev} className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 bg-gray-800/50 hover:bg-gray-800/70 focus:outline-none focus:ring-2 focus:ring-white rounded-full">
+            {/* <button onClick={handlePrev} className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 bg-gray-800/50 hover:bg-gray-800/70 focus:outline-none focus:ring-2 focus:ring-white rounded-full">
                 <svg
                     className="w-6 h-6 text-white"
                     fill="none"
@@ -65,7 +65,7 @@ const Carousel = ({ items }) => {
                 >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
-            </button>
+            </button> */}
         </div>
     );
 }
