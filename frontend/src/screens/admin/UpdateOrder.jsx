@@ -74,7 +74,7 @@ const UpdateOrder = () => {
                             </div>                    
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4">
                             <div className="col-span-1 bg-gray-50 shadow p-4">
                                 <div className="flex items-center justify-between">
                                     <h2 className="text-xl font-semibold mb-2">Order Status</h2>
