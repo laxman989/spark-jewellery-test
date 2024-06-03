@@ -31,13 +31,12 @@ const Orders = () => {
                     <div className="max-w-[1200px] mx-auto grid grid-cols-1 gap-4 py-4">
                         {
                             orders && orders.map((order) => (
-                                <Link to={`/account/order/${order._id}`} key={order._id} className="rounded border hover:shadow grid grid-cols-3 p-2 gap-4">
-                                    {/* <img className="sm:w-24 sm:h-24 w-20 h-20 object-contain rounded" src={order.image} alt="productImage" /> */}
-                                    <p>Order# {order._id}</p>
-                                    <div className="flex-grow pt-2">
+                                <Link to={`/account/order/${order._id}`} key={order._id} className="rounded border hover:shadow grid sm:grid-cols-3 col-span-2 p-2 gap-4">
+                                    <p className="col-span-1">Order# {order._id}</p>
+                                    <div className="pt-2 hidden sm:block col-span-1">
                                         <p className="font-semibold">Rs {order.totalPrice}</p>
                                     </div>
-                                    <div className="flex-grow pt-2">
+                                    <div className="pt-2 col-span-1">
                                         <p className="flex items-center gap-2">
                                             <p className={`h-3 w-3 rounded-full ${order?.orderStatus === "Delivered" ? "bg-green-600" : order?.orderStatus === "Shipped" ? "bg-blue-600" : order?.orderStatus === "Cancelled" ? "bg-red-600" : order?.orderStatus === "Processing" ? "bg-orange-600" : ""}`}></p>
                                             <p className="font-semibold">{order?.orderStatus === "Delivered" ? `${order.orderStatus} on ${order?.deliveredAt.slice(0,10)} (${order?.deliveredAt.slice(11, 16)})` : order?.orderStatus === "Shipped" ? `${order?.orderStatus} on ${order?.shippedAt.slice(0, 10)} (${order?.shippedAt.slice(11, 16)})` : order?.orderStatus === "Cancelled" ? `${order?.orderStatus} on ${order?.cancelledAt.slice(0, 10)} (${order?.cancelledAt.slice(11, 16)})` : order?.orderStatus}</p>
